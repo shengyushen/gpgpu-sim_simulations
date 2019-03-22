@@ -1,5 +1,6 @@
 # Location of the CUDA Toolkit
-CUDA_PATH ?= /usr/local/cuda-8.0
+#CUDA_PATH ?= /usr/local/cuda-8.0
+CUDA_PATH ?= /usr/local/cuda
 #CUDNN_PATH ?= /usr/local/cudnn7
 
 # architecture
@@ -211,5 +212,6 @@ run: build
 clean:
 	rm -rf *o
 	rm -rf mnistCUDNN
+	rm -f  _app_cuda_version_*  *.ptxas *.ptx _cuobjdump_list_ptx_* a.out
 
 clobber: clean
