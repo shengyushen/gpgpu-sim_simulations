@@ -453,12 +453,14 @@ class network_t
 
         scaling_type alpha = scaling_type(1);
         scaling_type beta  = scaling_type(1);
+				std::cout<<"\nSTART cudnnAddTensor"<<std::endl<<std::flush;
         checkCUDNN( cudnnAddTensor( cudnnHandle, 
                                     &alpha, biasTensorDesc,
                                     layer.bias_d,
                                     &beta,
                                     dstTensorDesc,
                                     data) );
+				std::cout<<"\nEND cudnnAddTensor"<<std::endl<<std::flush;
     }
     void fullyConnectedForward(const Layer_t<value_type>& ip,
                           int& n, int& c, int& h, int& w,
@@ -586,6 +588,7 @@ class network_t
         }
         scaling_type alpha = scaling_type(1);
         scaling_type beta  = scaling_type(0);
+				std::cout<<"\nSTART cudnnConvolutionForward"<<std::endl<<std::flush;
         checkCUDNN( cudnnConvolutionForward(cudnnHandle,
                                               &alpha,
                                               srcTensorDesc,
@@ -599,6 +602,7 @@ class network_t
                                               &beta,
                                               dstTensorDesc,
                                               *dstData) );
+				std::cout<<"\nEND cudnnConvolutionForward"<<std::endl<<std::flush;
         addBias(dstTensorDesc, conv, c, *dstData);
         if (sizeInBytes!=0)
         {
@@ -637,6 +641,7 @@ class network_t
         resize(n*c*h*w, dstData);
         scaling_type alpha = scaling_type(1);
         scaling_type beta = scaling_type(0);
+				std::cout << "\nSTART cudnnPoolingForward\n"<<std::flush;
         checkCUDNN( cudnnPoolingForward(cudnnHandle,
                                           poolingDesc,
                                           &alpha,
@@ -645,6 +650,7 @@ class network_t
                                           &beta,
                                           dstTensorDesc,
                                           *dstData) );
+				std::cout << "\nEND cudnnPoolingForward\n"<<std::flush;
     }
     void softmaxForward(int n, int c, int h, int w, value_type* srcData, value_type** dstData)
     {
@@ -655,6 +661,7 @@ class network_t
 
         scaling_type alpha = scaling_type(1);
         scaling_type beta  = scaling_type(0);
+				std::cout << "\nSTART cudnnSoftmaxForward\n"<<std::flush;
         checkCUDNN( cudnnSoftmaxForward(cudnnHandle,
                                           CUDNN_SOFTMAX_ACCURATE ,
                                           CUDNN_SOFTMAX_MODE_CHANNEL,
@@ -664,6 +671,7 @@ class network_t
                                           &beta,
                                           dstTensorDesc,
                                           *dstData) );
+				std::cout << "\nEND cudnnSoftmaxForward\n"<<std::flush;
     }
     void lrnForward(int n, int c, int h, int w, value_type* srcData, value_type** dstData)
     {
@@ -683,6 +691,7 @@ class network_t
 
         scaling_type alpha = scaling_type(1);
         scaling_type beta  = scaling_type(0);
+				std::cout << "\nSTART cudnnLRNCrossChannelForward\n"<<std::flush;
         checkCUDNN( cudnnLRNCrossChannelForward(cudnnHandle,
                                             normDesc,
                                             CUDNN_LRN_CROSS_CHANNEL_DIM1,
@@ -692,6 +701,7 @@ class network_t
                                             &beta,
                                             dstTensorDesc,
                                             *dstData) );
+				std::cout << "\nEND cudnnLRNCrossChannelForward\n"<<std::flush;
     }
     void activationForward(int n, int c, int h, int w, value_type* srcData, value_type** dstData)
     {
@@ -707,6 +717,7 @@ class network_t
 
         scaling_type alpha = scaling_type(1);
         scaling_type beta  = scaling_type(0);
+				std::cout << "\nSTART cudnnActivationForward\n"<<std::flush;
         checkCUDNN( cudnnActivationForward(cudnnHandle,
                                             activDesc,
                                             &alpha,
@@ -715,6 +726,7 @@ class network_t
                                             &beta,
                                             dstTensorDesc,
                                             *dstData) );    
+				std::cout << "\nEND cudnnActivationForward\n"<<std::flush;
     }
 
     int classify_example(const char* fname, const Layer_t<value_type>& conv1,
@@ -859,15 +871,21 @@ int main(int argc, char *argv[])
             Layer_t<float>   ip1(800,500,1,ip1_bin,ip1_bias_bin,argv[0]);
             Layer_t<float>   ip2(500,10,1,ip2_bin,ip2_bias_bin,argv[0]);
             get_path(image_path, first_image, argv[0]);
+						std::cout << "\nSTART image 1\n"<<std::flush;
             i1 = mnist.classify_example(image_path.c_str(), conv1, conv2, ip1, ip2);
+						std::cout << "\nEND image 1\n"<<std::flush;
             
             get_path(image_path, second_image, argv[0]);
+						std::cout << "\nSTART image 2\n"<<std::flush;
             i2 = mnist.classify_example(image_path.c_str(), conv1, conv2, ip1, ip2);
+						std::cout << "\nEND image 2\n"<<std::flush;
             
             get_path(image_path, third_image, argv[0]);
             // New feature in cuDNN v3: FFT for convolution
             mnist.setConvolutionAlgorithm(CUDNN_CONVOLUTION_FWD_ALGO_FFT);
+						std::cout << "\nSTART image 3 FFT\n"<<std::flush;
             i3 = mnist.classify_example(image_path.c_str(), conv1, conv2, ip1, ip2);
+						std::cout << "\nEND image 3 FFT\n"<<std::flush;
 
             std::cout << "\nResult of classification: " << i1 << " " << i2 << " " << i3 << std::endl;
             if (i1 != 1 || i2 != 3 || i3 != 5)
@@ -895,10 +913,14 @@ int main(int argc, char *argv[])
             // on device using CUDA kernel from fp16_dev.cu
             Layer_t<half1>   ip2(500,10,1,ip2_bin,ip2_bias_bin,argv[0], FP16_HOST);
             get_path(image_path, first_image, argv[0]);
+						std::cout << "\nSTART image 1\n"<<std::flush;
             i1 = mnist.classify_example(image_path.c_str(), conv1, conv2, ip1, ip2);
+						std::cout << "\nEND image 1\n"<<std::flush;
             
             get_path(image_path, second_image, argv[0]);
+						std::cout << "\nSTART image 2\n"<<std::flush;
             i2 = mnist.classify_example(image_path.c_str(), conv1, conv2, ip1, ip2);
+						std::cout << "\nEND image 2\n"<<std::flush;
             
             get_path(image_path, third_image, argv[0]);
             // New feature in cuDNN v3: FFT for convolution
@@ -906,7 +928,9 @@ int main(int argc, char *argv[])
             {
                 mnist.setConvolutionAlgorithm(CUDNN_CONVOLUTION_FWD_ALGO_FFT);
             }
+						std::cout << "\nSTART image 3 FFT\n"<<std::flush;
             i3 = mnist.classify_example(image_path.c_str(), conv1, conv2, ip1, ip2);
+						std::cout << "\nEND image 3 FFT\n"<<std::flush;
 
             std::cout << "\nResult of classification: " << i1 << " " << i2 << " " << i3 << std::endl;
             if (i1 != 1 || i2 != 3 || i3 != 5)

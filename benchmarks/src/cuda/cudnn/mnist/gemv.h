@@ -22,6 +22,7 @@ void gemv(cublasHandle_t cublasHandle, int m, int n, double alpha,
             const double *A, const double *x,
                                double beta, double *y)
 {
+		std::cout<<"\nSTART gemv"<<std::endl<<std::flush;
 #ifdef DISABLE_GEMV
     checkCublasErrors( cublasDgemm (cublasHandle, 
                       CUBLAS_OP_T,
@@ -46,12 +47,14 @@ void gemv(cublasHandle_t cublasHandle, int m, int n, double alpha,
                                   &beta,
                                   y, 1) );    
 #endif
+		std::cout<<"\nEND gemv"<<std::endl<<std::flush;
 };
 
 void gemv(cublasHandle_t cublasHandle, int m, int n, float alpha, 
             const float *A, const float *x,
                                float beta, float *y)
 {
+		std::cout<<"\nSTART gemv"<<std::endl<<std::flush;
 #ifdef DISABLE_GEMV
     checkCublasErrors( cublasSgemm (cublasHandle, 
                       CUBLAS_OP_T,
@@ -76,6 +79,7 @@ void gemv(cublasHandle_t cublasHandle, int m, int n, float alpha,
                                   &beta,
                                   y, 1) );    
 #endif
+		std::cout<<"\nEND gemv"<<std::endl<<std::flush;
 };
 
 #if defined(CUDA_VERSION) && (CUDA_VERSION > 7000)
@@ -87,6 +91,7 @@ void gemv(cublasHandle_t cublasHandle, int m, int n, float alpha,
             const half1 *A, const half1 *x,
                                float beta, half1 *y)
 {
+		std::cout<<"\nSTART gemv"<<std::endl<<std::flush;
     checkCublasErrors( cublasSgemmEx  ( cublasHandle, 
                                       CUBLAS_OP_T,
                                       CUBLAS_OP_N, 
@@ -104,6 +109,7 @@ void gemv(cublasHandle_t cublasHandle, int m, int n, float alpha,
                                       y,
                                       CUDA_R_16F,
                                       m) );
+		std::cout<<"\nEND gemv"<<std::endl<<std::flush;
 };
 #endif
 
